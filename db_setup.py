@@ -33,25 +33,27 @@ def create_tables():
     """
     connection = get_connection()
 
-    users_table = """ CREATE TABLE IF NOT EXISTS users(
+    user_table = """ CREATE TABLE IF NOT EXISTS users(
         user_id SERIAL PRIMARY KEY,
-        username VARCHAR(50) UNIQUE,
-        email VARCHAR(250),
-        password VARCHAR(100),
+        password VARCHAR(50),
+        name VARCHAR(50) UNIQUE,
+        weight BIGINT,
+        user_record_id BIGINT,
+        height BIGINT
     )
     """
 
-    roles_table = """
-    CREATE TABLE IF NOT EXISTS roles(
-        role_id SERIAL PRIMARY KEY,
+    categories_table = """
+    CREATE TABLE IF NOT EXISTS categories(
+        category_id SERIAL PRIMARY KEY,
         name VARCHAR(100) UNIQUE
     )
     """
 
     with connection:
         with connection.cursor() as cursor:
-            cursor.execute(roles_table)
-            cursor.execute(users_table)
+            cursor.execute(categories_table)
+            cursor.execute(user_table)
 
 
 if __name__ == "__main__":

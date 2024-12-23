@@ -28,18 +28,16 @@ def insert_data():
     connection = get_connection()
 
     inserts = [
-        # Roles
-        "INSERT INTO roles (name) VALUES ('Admin'), ('Realtor'), ('Buyer')",
+        # Categories
+        "INSERT INTO categories (name) VALUES ('Cardio'), ('Strength')",
 
         # Users
         """
-        INSERT INTO users (username, email, password, role_id, realtor_id) VALUES
+        INSERT INTO users (password,name, weight, user_record_id, height) VALUES
         ('admin', 'admin@example.com', 'securepassword1', 1, NULL),
         ('realtor_john', 'john@example.com', 'securepassword2', 2, 1),
         ('buyer_emily', 'emily@example.com', 'securepassword3', 3, NULL)
         """,
-
-        # Address
 
     ]
 

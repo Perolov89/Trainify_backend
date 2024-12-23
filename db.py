@@ -10,13 +10,13 @@ from psycopg2.errors import ForeignKeyViolation
 def get_user_db(con, user_id: int):
     """
     Fetches one user based on the id
-    raises: UserNotFoundError if movie was not found
+    raises: Error if movie was not found
     """
     with con:
         with con.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(
                 """
-                           SELECT * FROM user
+                           SELECT * FROM users
                            WHERE user_id = %s
                            """,
                 (user_id,),
@@ -35,7 +35,7 @@ def get_users_db(con):
         with con.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(
                 """
-                           SELECT * FROM user;
+                           SELECT * FROM users;
                            """
             )
             result = cursor.fetchall()
@@ -46,7 +46,7 @@ def create_user_db(con, password,name,weight,user_record_id,height):
     """
     Creates new user
 
-    Raises exception if invalid user_id or realtor_id is provided
+    Raises exception if invalid user_id is provided
     """
     try:
         with con:
@@ -89,7 +89,7 @@ def update_user_db(con, user_id: int, update_column: str, update_value: str):
         raise ValueError('No value was passed')
 
     query = f"""
-            UPDATE user
+            UPDATE users
             SET {update_column} = %s
             WHERE user_id = %s
             RETURNING user_id;
@@ -115,7 +115,7 @@ def delete_user_db(con, user_id: int):
         with con.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(
                 """
-                           DELETE FROM user
+                           DELETE FROM users
                            WHERE user_id = %s
                            RETURNING user_id;
                            """,

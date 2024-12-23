@@ -51,19 +51,19 @@ def create_user(user: UserCreate, con: Any = Depends(get_connection)):
     """
     Creates a user
 
-    Raises exception if username or email already exists.
+    Raises exception if name already exists.
     Also raises exception if something went wrong when creating the user
     """
     try:
-        result = create_user_db(con, user.username, user.email,
-                                user.password, user.role_id, user.realtor_id)
+        result = create_user_db(con, user.password, user.name,
+                                user.weight, user.user_record_id, user.weight)
         if result:
             return {'message': f'User created sucessfully with id: {result}'}
         raise HTTPException(
             detail='User not created properly', status_code=400)
     except IntegrityError:
         raise HTTPException(
-            status_code=409, detail="Username or email already exists.")
+            status_code=409, detail="Name already exists.")
 
 
 @app.patch('/users/{user_id}', status_code=status.HTTP_200_OK)
@@ -71,7 +71,7 @@ def update_user(user_id: int, user: UserUpdate, con: Any = Depends(get_connectio
     """
     Updates one or more fields in a user by ID
 
-    Raises exception if username or email already exists, or if no input was provided.
+    Raises exception if name already exists, or if no input was provided.
 
     """
     try:
