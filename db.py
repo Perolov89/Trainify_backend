@@ -16,7 +16,7 @@ def get_user_db(con, user_id: int):
         with con.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(
                 """
-                           SELECT * FROM users
+                           SELECT * FROM user
                            WHERE user_id = %s
                            """,
                 (user_id,),
@@ -35,14 +35,14 @@ def get_users_db(con):
         with con.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(
                 """
-                           SELECT * FROM users;
+                           SELECT * FROM user;
                            """
             )
             result = cursor.fetchall()
             return result
 
 
-def create_user_db(con, username, email, password, role_id, realtor_id):
+def create_user_db(con, password,name,weight,user_record_id,height):
     """
     Creates new user
 
@@ -53,15 +53,15 @@ def create_user_db(con, username, email, password, role_id, realtor_id):
             with con.cursor(cursor_factory=RealDictCursor) as cursor:
                 cursor.execute(
                     """
-                    INSERT INTO users(username,email,password,role_id,realtor_id)
+                    INSERT INTO users(password,name,weight,user_record_id,height)
                     VALUES(%s,%s,%s,%s,%s)
                     RETURNING user_id
                     """,
-                    (username, email, password, role_id, realtor_id),
+                    (name, password, name, weight, user_record_id, height),
                 )
                 result = cursor.fetchone()
                 if result:
-                    print(f"User {username} was created successfully!")
+                    print(f"User {name} was created successfully!")
                     return result['user_id']
     except ForeignKeyViolation:
         # Transaction will automatically rollback due to the context manager
@@ -80,7 +80,7 @@ def update_user_db(con, user_id: int, update_column: str, update_value: str):
     """
 
     # Validation to avoid sql-injection
-    valid_columns = {"username", "email", "password", "role_id", "realtor_id"}
+    valid_columns = {'name', 'password', 'name', 'weight', 'user_record_id', 'height'}
     if update_column not in valid_columns:
         raise ValueError(f"Invalid column name: {update_column}")
 
@@ -89,7 +89,7 @@ def update_user_db(con, user_id: int, update_column: str, update_value: str):
         raise ValueError('No value was passed')
 
     query = f"""
-            UPDATE users
+            UPDATE user
             SET {update_column} = %s
             WHERE user_id = %s
             RETURNING user_id;
@@ -115,7 +115,7 @@ def delete_user_db(con, user_id: int):
         with con.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(
                 """
-                           DELETE FROM users
+                           DELETE FROM user
                            WHERE user_id = %s
                            RETURNING user_id;
                            """,
