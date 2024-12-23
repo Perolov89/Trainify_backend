@@ -8,25 +8,28 @@ from datetime import datetime
 
 
 class UserCreate(BaseModel):
-    username: str = Field(max_length=250)
-    email: EmailStr
     password: str= Field(max_length=100)
-    role_id: int
-    realtor_id: Optional[int]
+    name: str = Field(max_length=250)
+    weight: int
+    user_record_id: Optional[int]
+    height: Optional[int]
+    email: EmailStr
 
 
 class UserUpdate(BaseModel):
-    username: Optional[str] = Field(None, max_length=250)
-    email: Optional[str] = Field(None)
     password: Optional[str] = Field(None)
-    role_id: Optional[int] = Field(None)
-    realtor_id: Optional[int] = Field(None)
+    name: Optional[str] = Field(None, max_length=250)
+    weight: Optional[int] = Field(None)
+    user_record_id: Optional[int] = Field(None)
+    height: Optional[int] = Field(None)
+    email: Optional[str] = Field(None)
 
 
 class UserResponse(BaseModel):
     id: int
-    username: str = Field(max_length=250)
-    email: str
     password: str= Field(max_length=100)
-    role_id: int
-    realtor_id: int
+    name: str = Field(max_length=250)
+    weight: int
+    user_record_id: int
+    height: int
+    email: str
