@@ -4,8 +4,8 @@ from typing import Any
 import psycopg2
 from db_setup import get_connection
 from fastapi import FastAPI, HTTPException, status, Depends
-from db import create_user_db, get_user_db, update_user_db, delete_user_db, get_users_db, create_review_db, update_review_db, get_review_db, delete_review_db, get_realtor_reviews_db,get_roles_db,create_role_db
-from schemas import UserCreate, UserUpdate, ReviewCreate, ReviewUpdate, RoleCreate
+from db import create_user_db, get_user_db, update_user_db, delete_user_db, get_users_db
+from schemas import UserCreate, UserUpdate
 from psycopg2.errors import IntegrityError
 app = FastAPI()
 

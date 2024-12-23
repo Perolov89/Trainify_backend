@@ -38,8 +38,6 @@ def create_tables():
         username VARCHAR(50) UNIQUE,
         email VARCHAR(250),
         password VARCHAR(100),
-        role_id INT REFERENCES roles(role_id),
-        realtor_id INT REFERENCES realtor_agents(realtor_id)
     )
     """
 
