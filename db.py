@@ -7,6 +7,8 @@ from psycopg2.errors import ForeignKeyViolation
 # which the fastapi endpoints/routes can use.
 
 #                                                       Users
+
+
 def get_user_db(con, user_id: int):
     """
     Fetches one user based on the id
@@ -42,7 +44,7 @@ def get_users_db(con):
             return result
 
 
-def create_user_db(con, password,name,weight,user_record_id,height):
+def create_user_db(con, password, name, weight, user_record_id, height):
     """
     Creates new user
 
@@ -80,7 +82,8 @@ def update_user_db(con, user_id: int, update_column: str, update_value: str):
     """
 
     # Validation to avoid sql-injection
-    valid_columns = {'name', 'password', 'name', 'weight', 'user_record_id', 'height'}
+    valid_columns = {'name', 'password', 'name',
+                     'weight', 'user_record_id', 'height'}
     if update_column not in valid_columns:
         raise ValueError(f"Invalid column name: {update_column}")
 
@@ -128,7 +131,6 @@ def delete_user_db(con, user_id: int):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
-
 #                                                   Exercises
 
 def get_exercises_db(con):
@@ -144,6 +146,7 @@ def get_exercises_db(con):
             )
             result = cursor.fetchall()
             return result
+
 
 def get_exercise_db(con, exercise_id: int):
     """
@@ -165,7 +168,7 @@ def get_exercise_db(con, exercise_id: int):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
-def create_exercise_db(con, exercise_name,exercise_weight,repmax_id,primary_muscle_id,secondary_muscle_id,category_id):
+def create_exercise_db(con, exercise_name, exercise_weight, repmax_id, primary_muscle_id, secondary_muscle_id, category_id):
     """
     Creates new exercise
 
@@ -180,11 +183,13 @@ def create_exercise_db(con, exercise_name,exercise_weight,repmax_id,primary_musc
                     VALUES(%s,%s,%s,%s,%s,%s)
                     RETURNING exercise_id
                     """,
-                    (exercise_name,exercise_weight,repmax_id,primary_muscle_id,secondary_muscle_id,category_id),
+                    (exercise_name, exercise_weight, repmax_id,
+                     primary_muscle_id, secondary_muscle_id, category_id),
                 )
                 result = cursor.fetchone()
                 if result:
-                    print(f"Exercise {exercise_name} was created successfully!")
+                    print(f"Exercise {
+                          exercise_name} was created successfully!")
                     return result['exercise_id']
     except ForeignKeyViolation:
         # Transaction will automatically rollback due to the context manager
@@ -203,7 +208,8 @@ def update_exercise_db(con, exercise_id: int, update_column: str, update_value: 
     """
 
     # Validation to avoid sql-injection
-    valid_columns = {'exercise_name', 'exercise_weight', 'repmax_id', 'primary_muscle_id', 'secondary_muscle_id', 'category_id'}
+    valid_columns = {'exercise_name', 'exercise_weight', 'repmax_id',
+                     'primary_muscle_id', 'secondary_muscle_id', 'category_id'}
     if update_column not in valid_columns:
         raise ValueError(f"Invalid column name: {update_column}")
 
@@ -249,10 +255,10 @@ def delete_exercise_db(con, exercise_id: int):
                 print(f"Exercise was deleted successfully!")
                 return result
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-        
+
 
 #                                                    Records
-        
+
 
 def get_record_db(con):
     """
@@ -269,7 +275,7 @@ def get_record_db(con):
             return result
 
 
-def create_record_db(con, workout_id, user_id,record_time):
+def create_record_db(con, workout_id, user_id, record_time):
     """
     Creates new record
 
@@ -282,14 +288,15 @@ def create_record_db(con, workout_id, user_id,record_time):
                     """
                     INSERT INTO records(workout_id, user_id, record_time)
                     VALUES(%s,%s,%s)
-                    RETURNING user_id
+                    RETURNING record_id
                     """,
-                    (workout_id,user_id,record_time),
+                    (workout_id, user_id, record_time),
                 )
                 result = cursor.fetchone()
                 if result:
-                    print(f"Record for workout with id:{workout_id} was created successfully!")
-                    return result['user_id']
+                    print(f"Record for workout with id:{
+                          workout_id} was created successfully!")
+                    return result['record_id']
     except ForeignKeyViolation:
         # Transaction will automatically rollback due to the context manager
         raise HTTPException(
@@ -353,3 +360,113 @@ def delete_record_db(con, record_id: int):
                 print(f"Record was deleted successfully!")
                 return result
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+
+#                                               Repmaxes
+        
+
+def get_repmax_db(con):
+    """
+    Fetches all repmax's
+    """
+    with con:
+        with con.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(
+                """
+                           SELECT * FROM repmax;
+                           """
+            )
+            result = cursor.fetchall()
+            return result
+
+
+def create_repmax_db(con, exercise_id, user_id, weight):
+    """
+    Creates new repmax
+
+    Raises exception if invalid user_id is provided
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cursor:
+                cursor.execute(
+                    """
+                    INSERT INTO repmax(exercise_id, user_id, weight)
+                    VALUES(%s,%s,%s)
+                    RETURNING repmax_id
+                    """,
+                    (exercise_id, user_id, weight),
+                )
+                result = cursor.fetchone()
+                if result:
+                    print(f"Repmax for exercise with id:{exercise_id} was created successfully!")
+                    return result['repmax_id']
+    except ForeignKeyViolation:
+        # Transaction will automatically rollback due to the context manager
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid user_id or workout_id provided"
+        )
+
+
+def update_repmax_db(con, repmax_id: int, update_column: str, update_value: str):
+    """
+    Update one or more values in repmax
+
+    Raises exception if no value is passed or the column name is invalid
+    Also raises exception if the record is not found 
+    """
+
+    # Validation to avoid sql-injection
+    valid_columns = {'weight'}
+    if update_column not in valid_columns:
+        raise ValueError(f"Invalid column name: {update_column}")
+
+    # Check if value is empty
+    if not update_value:
+        raise ValueError('No value was passed')
+
+    query = f"""
+            UPDATE repmax
+            SET {update_column} = %s
+            WHERE weight = %s
+            RETURNING repmax_id;
+            """
+
+    with con:
+        with con.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(query, (update_value, repmax_id))
+            result = cursor.fetchone()
+            if result:
+                print(f"Weight for repmax was updated successfully!")
+                return result
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+
+def delete_repmax_db(con, repmax_id: int):
+    """
+    Delete a repmax by ID
+
+    Raises exception if repmax is not found
+    """
+    with con:
+        with con.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(
+                """
+                           DELETE FROM repmax
+                           WHERE repmax_id = %s
+                           RETURNING repmax_id;
+                           """,
+                (repmax_id,),
+            )
+            result = cursor.fetchone()
+            if result:
+                print(f"Repmax was deleted successfully!")
+                return result
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+
+#                                               workouts
+        
+
+        
