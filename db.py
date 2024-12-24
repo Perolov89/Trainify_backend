@@ -168,23 +168,23 @@ def get_exercise_db(con, exercise_id: int):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
-def create_exercise_db(con, exercise_name, exercise_weight, repmax_id, primary_muscle_id, secondary_muscle_id, category_id):
+def create_exercise_db(con, exercise_name, exercise_weight, repmax_id, primary_muscle, secondary_muscle, category_id):
     """
     Creates new exercise
 
-    Raises exception if invalid repmax_id, primary_muscle_id,secondary_muscle_id or categpory_id is provided
+    Raises exception if invalid repmax_id or categpory_id is provided
     """
     try:
         with con:
             with con.cursor(cursor_factory=RealDictCursor) as cursor:
                 cursor.execute(
                     """
-                    INSERT INTO exercises(exercise_name,exercise_weight,repmax_id,primary_muscle_id,secondary_muscle_id,category_id)
+                    INSERT INTO exercises(exercise_name,exercise_weight,repmax_id,primary_muscle,secondary_muscle,category_id)
                     VALUES(%s,%s,%s,%s,%s,%s)
                     RETURNING exercise_id
                     """,
                     (exercise_name, exercise_weight, repmax_id,
-                     primary_muscle_id, secondary_muscle_id, category_id),
+                     primary_muscle, secondary_muscle, category_id),
                 )
                 result = cursor.fetchone()
                 if result:
@@ -209,7 +209,7 @@ def update_exercise_db(con, exercise_id: int, update_column: str, update_value: 
 
     # Validation to avoid sql-injection
     valid_columns = {'exercise_name', 'exercise_weight', 'repmax_id',
-                     'primary_muscle_id', 'secondary_muscle_id', 'category_id'}
+                     'primary_muscle', 'secondary_muscle', 'category_id'}
     if update_column not in valid_columns:
         raise ValueError(f"Invalid column name: {update_column}")
 
