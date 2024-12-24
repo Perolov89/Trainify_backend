@@ -14,10 +14,10 @@ def get_connection():
     """
     return psycopg2.connect(
         dbname=DATABASE_NAME,
-        user="postgres",  # Update if needed
+        user="postgres",
         password=PASSWORD,
-        host="localhost",  # Update if needed
-        port="5432",  # Update if needed
+        host="localhost",
+        port="5432",
     )
 
 

@@ -4,7 +4,7 @@ from typing import Any
 import psycopg2
 from db_setup import get_connection
 from fastapi import FastAPI, HTTPException, status, Depends
-from db import create_user_db, get_user_db, update_user_db, delete_user_db, get_users_db
+from db import create_user_db, get_user_db, update_user_db, delete_user_db, get_users_db,get_categories_db,get_exercise_db,get_exercises_db,get_record_db,get_repmax_db,get_workouts_db,update_exercise_db,update_records_db,update_repmax_db,update_workouts_db,create_category_db,create_exercise_db,create_record_db,create_repmax_db,create_workout_db,delete_category_db,delete_exercise_db,delete_record_db,delete_repmax_db
 from schemas import UserCreate, UserUpdate
 from psycopg2.errors import IntegrityError
 app = FastAPI()
