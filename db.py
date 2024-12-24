@@ -573,3 +573,63 @@ def delete_record_db(con, workout_id: int):
 
 #                                                   Categories
         
+def get_categories_db(con):
+    """
+    Fetches all categories
+    """
+    with con:
+        with con.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(
+                """
+                           SELECT * FROM categories;
+                           """
+            )
+            result = cursor.fetchall()
+            return result
+
+
+def create_category_db(con, category_name):
+    """
+    Creates new category
+
+    """
+
+    with con:
+        with con.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(
+                """
+                INSERT INTO categories(category_name)
+                VALUES(%s)
+                RETURNING category_id
+                """,
+                (category_name),
+            )
+            result = cursor.fetchone()
+            if result:
+                print(f"Category {category_name} was created successfully!")
+                return result['category_id']
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+
+
+def delete_category_db(con, category_id: int):
+    """
+    Delete a category by ID
+
+    Raises exception if category is not found
+    """
+    with con:
+        with con.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(
+                """
+                           DELETE FROM categories
+                           WHERE cateogry_id = %s
+                           RETURNING category_id;
+                           """,
+                (category_id,),
+            )
+            result = cursor.fetchone()
+            if result:
+                print(f"Category was deleted successfully!")
+                return result
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
