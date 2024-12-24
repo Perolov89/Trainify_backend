@@ -12,7 +12,7 @@ from psycopg2.errors import ForeignKeyViolation
 def get_user_db(con, user_id: int):
     """
     Fetches one user based on the id
-    raises: Error if movie was not found
+    raises: Error if user was not found
     """
     with con:
         with con.cursor(cursor_factory=RealDictCursor) as cursor:
@@ -363,7 +363,7 @@ def delete_record_db(con, record_id: int):
 
 
 #                                               Repmaxes
-        
+
 
 def get_repmax_db(con):
     """
@@ -399,7 +399,8 @@ def create_repmax_db(con, exercise_id, user_id, weight):
                 )
                 result = cursor.fetchone()
                 if result:
-                    print(f"Repmax for exercise with id:{exercise_id} was created successfully!")
+                    print(f"Repmax for exercise with id:{
+                          exercise_id} was created successfully!")
                     return result['repmax_id']
     except ForeignKeyViolation:
         # Transaction will automatically rollback due to the context manager
@@ -467,8 +468,7 @@ def delete_repmax_db(con, repmax_id: int):
 
 
 #                                               workouts
-        
-        
+
 
 def get_workouts_db(con):
     """
@@ -500,7 +500,7 @@ def create_workout_db(con, workout_name, timecap, record_id, exercise_id):
                     VALUES(%s,%s,%s,%s)
                     RETURNING workout_id
                     """,
-                    (workout_name,timecap, record_id, exercise_id),
+                    (workout_name, timecap, record_id, exercise_id),
                 )
                 result = cursor.fetchone()
                 if result:
@@ -572,7 +572,7 @@ def delete_record_db(con, workout_id: int):
 
 
 #                                                   Categories
-        
+
 def get_categories_db(con):
     """
     Fetches all categories
@@ -632,4 +632,3 @@ def delete_category_db(con, category_id: int):
                 print(f"Category was deleted successfully!")
                 return result
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-

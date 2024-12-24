@@ -33,3 +33,94 @@ class UserResponse(BaseModel):
     user_record_id: int
     height: int
 
+#                                                            Exercise
+class ExerciseCreate(BaseModel):
+    exercise_name: str = Field(max_length=250)
+    exercise_weight: int
+    repmax_id: int
+    primary_muscle: Optional[str] = Field(None, max_length=100)
+    secondary_muscle: Optional[str] = Field(None, max_length=100)
+    category_id: int
+
+class ExerciseUpdate(BaseModel):
+    exercise_name: Optional[str] = Field(None, max_length=250)
+    exercise_weight: Optional[int] = Field(None)
+    repmax_id: Optional[int] = Field(None)
+    primary_muscle: Optional[str] = Field(None, max_length=100)
+    secondary_muscle: Optional[str] = Field(None, max_length=100)
+    category_id: Optional[int] = Field(None)
+
+class ExerciseResponse(BaseModel):
+    id: int
+    exercise_name: str = Field(max_length=250)
+    exercise_weight: int
+    repmax_id: int
+    primary_muscle: Optional[str]
+    secondary_muscle: Optional[str]
+    category_id: int
+
+
+#                                                              Record
+class RecordCreate(BaseModel):
+    workout_id: int
+    user_id: int
+    record_time: datetime
+
+class RecordUpdate(BaseModel):
+    workout_id: Optional[int] = Field(None)
+    user_id: Optional[int] = Field(None)
+    record_time: Optional[datetime] = Field(None)
+
+class RecordResponse(BaseModel):
+    id: int
+    workout_id: int
+    user_id: int
+    record_time: datetime
+
+
+#                                                              Repmax
+class RepmaxCreate(BaseModel):
+    exercise_id: int
+    user_id: int
+    weight: int
+
+class RepmaxUpdate(BaseModel):
+    exercise_id: Optional[int] = Field(None)
+    user_id: Optional[int] = Field(None)
+    weight: Optional[int] = Field(None)
+
+class RepmaxResponse(BaseModel):
+    id: int
+    exercise_id: int
+    user_id: int
+    weight: int
+
+
+#                                                            Workout
+class WorkoutCreate(BaseModel):
+    workout_name: str = Field(max_length=250)
+    timecap: Optional[int]
+    record_id: int
+    exercise_id: int
+
+class WorkoutUpdate(BaseModel):
+    workout_name: Optional[str] = Field(None, max_length=250)
+    timecap: Optional[int] = Field(None)
+    record_id: Optional[int] = Field(None)
+    exercise_id: Optional[int] = Field(None)
+
+class WorkoutResponse(BaseModel):
+    id: int
+    workout_name: str = Field(max_length=250)
+    timecap: Optional[int]
+    record_id: int
+    exercise_id: int
+
+
+#                                                           Category
+class CategoryCreate(BaseModel):
+    category_name: str = Field(max_length=100)
+
+class CategoryResponse(BaseModel):
+    id: int
+    category_name: str = Field(max_length=100)
