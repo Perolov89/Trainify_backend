@@ -468,5 +468,108 @@ def delete_repmax_db(con, repmax_id: int):
 
 #                                               workouts
         
+        
 
+def get_workouts_db(con):
+    """
+    Fetches all workouts
+    """
+    with con:
+        with con.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(
+                """
+                           SELECT * FROM workouts;
+                           """
+            )
+            result = cursor.fetchall()
+            return result
+
+
+def create_workout_db(con, workout_name, timecap, record_id, exercise_id):
+    """
+    Creates new workout
+
+    Raises exception if invalid user_id is provided
+    """
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cursor:
+                cursor.execute(
+                    """
+                    INSERT INTO workouts(workout_name,timecap,record_id,exercise_id)
+                    VALUES(%s,%s,%s,%s)
+                    RETURNING workout_id
+                    """,
+                    (workout_name,timecap, record_id, exercise_id),
+                )
+                result = cursor.fetchone()
+                if result:
+                    print(f"Workout {workout_name} was created successfully!")
+                    return result['workout_id']
+    except ForeignKeyViolation:
+        # Transaction will automatically rollback due to the context manager
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid user_id or exercise_id provided"
+        )
+
+
+def update_workouts_db(con, workout_id: int, update_column: str, update_value: str):
+    """
+    Update one or more values in workouts
+
+    Raises exception if no value is passed or the column name is invalid
+    Also raises exception if the record is not found 
+    """
+
+    # Validation to avoid sql-injection
+    valid_columns = {'workout_name', 'timecap', 'record_id', 'exercise_id'}
+    if update_column not in valid_columns:
+        raise ValueError(f"Invalid column name: {update_column}")
+
+    # Check if value is empty
+    if not update_value:
+        raise ValueError('No value was passed')
+
+    query = f"""
+            UPDATE workouts
+            SET {update_column} = %s
+            WHERE workout_id = %s
+            RETURNING workout_id;
+            """
+
+    with con:
+        with con.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(query, (update_value, workout_id))
+            result = cursor.fetchone()
+            if result:
+                print(f"Workout was updated successfully!")
+                return result
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+
+def delete_record_db(con, workout_id: int):
+    """
+    Delete a workout by ID
+
+    Raises exception if workout is not found
+    """
+    with con:
+        with con.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(
+                """
+                           DELETE FROM workouts
+                           WHERE workout_id = %s
+                           RETURNING workout_id;
+                           """,
+                (workout_id,),
+            )
+            result = cursor.fetchone()
+            if result:
+                print(f"Workout was deleted successfully!")
+                return result
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+
+#                                                   Categories
         
