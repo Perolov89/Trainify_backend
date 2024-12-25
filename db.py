@@ -260,7 +260,27 @@ def delete_exercise_db(con, exercise_id: int):
 #                                                    Records
 
 
-def get_record_db(con):
+def get_record_db(con, user_id: int):
+    """
+    Fetches one record based on the id
+    raises: Error if user was not found
+    """
+    with con:
+        with con.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(
+                """
+                           SELECT * FROM records
+                           WHERE user_id = %s
+                           """,
+                (user_id,),
+            )
+            result = cursor.fetchone()
+            if result:
+                return result
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+
+def get_records_db(con):
     """
     Fetches all records
     """
@@ -305,33 +325,25 @@ def create_record_db(con, workout_id, user_id, record_time):
         )
 
 
-def update_records_db(con, record_id: int, update_column: str, update_value: str):
+def update_records_db(con, record_id: int, record_time: str):
     """
     Update one or more values in records
 
-    Raises exception if no value is passed or the column name is invalid
+    Raises exception if no value is passed
     Also raises exception if the record is not found 
     """
-
-    # Validation to avoid sql-injection
-    valid_columns = {'workout_id', 'user_id', 'record_time'}
-    if update_column not in valid_columns:
-        raise ValueError(f"Invalid column name: {update_column}")
-
     # Check if value is empty
-    if not update_value:
+
+    if not record_time:
         raise ValueError('No value was passed')
-
-    query = f"""
-            UPDATE records
-            SET {update_column} = %s
-            WHERE record_id = %s
-            RETURNING record_id;
-            """
-
     with con:
         with con.cursor(cursor_factory=RealDictCursor) as cursor:
-            cursor.execute(query, (update_value, record_id))
+            cursor.execute("""
+                            UPDATE records
+                            SET record_time = %s
+                            WHERE record_id = %s
+                            RETURNING record_id;
+                            """, (record_time, record_id))
             result = cursor.fetchone()
             if result:
                 print(f"Record was updated successfully!")
