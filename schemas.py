@@ -41,6 +41,7 @@ class ExerciseCreate(BaseModel):
     primary_muscle: Optional[str] = Field(None, max_length=100)
     secondary_muscle: Optional[str] = Field(None, max_length=100)
     category_id: int
+    base_exercise: bool
 
 class ExerciseUpdate(BaseModel):
     exercise_name: Optional[str] = Field(None, max_length=250)
@@ -49,6 +50,7 @@ class ExerciseUpdate(BaseModel):
     primary_muscle: Optional[str] = Field(None, max_length=100)
     secondary_muscle: Optional[str] = Field(None, max_length=100)
     category_id: Optional[int] = Field(None)
+    base_exercise: Optional[bool]
 
 class ExerciseResponse(BaseModel):
     id: int
@@ -58,7 +60,7 @@ class ExerciseResponse(BaseModel):
     primary_muscle: Optional[str]
     secondary_muscle: Optional[str]
     category_id: int
-
+    base_exercise: bool
 
 #                                                              Record
 class RecordCreate(BaseModel):
