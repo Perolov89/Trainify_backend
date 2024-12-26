@@ -625,7 +625,6 @@ def get_categories_db(con):
 def create_category_db(con, name):
     """
     Creates new category
-
     """
 
     with con:
