@@ -4,7 +4,7 @@ from typing import Any
 import psycopg2
 from db_setup import get_connection
 from fastapi import FastAPI, HTTPException, status, Depends
-from db import create_user_db, get_user_db, update_user_db, delete_user_db, get_users_db,get_records_db,get_categories_db,get_exercise_db,get_exercises_db,get_record_db,get_workout_db,get_repmax_db,get_workouts_db,update_exercise_db,update_records_db,update_repmax_db,update_workouts_db,create_category_db,create_exercise_db,create_record_db,create_repmax_db,create_workout_db,delete_category_db,delete_exercise_db,delete_record_db,delete_repmax_db
+from db import create_user_db, get_user_db, update_user_db, delete_user_db, get_users_db,get_records_db,get_categories_db,get_exercise_db,get_exercises_db,get_record_db,get_workout_db,get_repmaxs_db,get_workouts_db,update_exercise_db,update_records_db,update_repmax_db,update_workout_db,create_category_db,create_exercise_db,create_record_db,create_repmax_db,create_workout_db,delete_category_db,delete_exercise_db,delete_record_db,delete_repmax_db,delete_workout_db
 from schemas import UserCreate, UserUpdate,RecordCreate,RecordResponse,RecordUpdate,RepmaxCreate,RepmaxResponse,RepmaxUpdate,UserResponse,WorkoutCreate,WorkoutResponse,WorkoutUpdate,ExerciseCreate,ExerciseResponse,ExerciseUpdate,CategoryResponse,CategoryCreate
 from psycopg2.errors import IntegrityError
 app = FastAPI()
@@ -106,7 +106,7 @@ def delete_user(user_id: int, con: Any = Depends(get_connection)):
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
-#                                                   Records
+#                                                   Records Endpoints
     
 
 
@@ -183,7 +183,7 @@ def delete_record(record_id: int, con: Any = Depends(get_connection)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     
 
-#                                                   Exercises
+#                                                   Exercises Endpoints
     
 
 
@@ -239,7 +239,7 @@ def update_exercise(exercise_id: int, exercise: ExerciseUpdate, con: Any = Depen
 
     """
     try:
-        # Extract fields from UserUpdate and iterate over them
+        # Extract fields from ExerciseUpdate and iterate over them
         # Only include fields that are set
         update_data = exercise.model_dump(exclude_unset=True)
         if not update_data:
@@ -271,7 +271,7 @@ def delete_exercise(exercise_id: int, con: Any = Depends(get_connection)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     
 
-#                                                   Workouts
+#                                                   Workouts Endpoints
     
 
 
@@ -308,15 +308,15 @@ def create_user(workout: WorkoutCreate, con: Any = Depends(get_connection)):
     Also raises exception if something went wrong when creating the workout
     """
     try:
-        result = create_workout_db(con, workout.workout_name, workout.name,
-                                workout.weight, workout.user_record_id, workout.weight)
+        result = create_workout_db(con, workout.name, workout.timecap,
+                                 workout.record_id, workout.exercise_id)
         if result:
-            return {'message': f'workout created sucessfully with id: {result}'}
+            return {'message': f'Workout created sucessfully with id: {result}'}
         raise HTTPException(
-            detail='workout not created properly', status_code=400)
+            detail='Workout not created properly', status_code=400)
     except IntegrityError:
         raise HTTPException(
-            status_code=409, detail="Name already exists.")
+            status_code=409, detail="Workout already exists.")
 
 
 @app.patch('/workouts/{workout_id}', status_code=status.HTTP_200_OK)
@@ -324,11 +324,11 @@ def update_workout(workout_id: int, workout: WorkoutUpdate, con: Any = Depends(g
     """
     Updates one or more fields in a workout by ID
 
-    Raises exception if name already exists, or if no input was provided.
+    Raises exception if workout already exists, or if no input was provided.
 
     """
     try:
-        # Extract fields from workoutUpdate and iterate over them
+        # Extract fields from WorkoutUpdate and iterate over them
         # Only include fields that are set
         update_data = workout.model_dump(exclude_unset=True)
         if not update_data:
@@ -358,94 +358,80 @@ def delete_workout(workout_id: int, con: Any = Depends(get_connection)):
         return {'message': f'Workout with id {result['workout_id']} deleted'}
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-#                                                   Repmax
     
 
+#                                                   Repmax Endpoints
 
-@app.get("/workouts/{user_id}", status_code=200)
-def get_user(user_id: int):
+@app.get("/repmaxs", status_code=200)
+def get_repmaxs():
     """
-    Returns a user by ID
-
-    Raises exception if user is not found
-    """
-    con = get_connection()
-    user = get_user_db(con, user_id)
-    if user:
-        return user
-    else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-
-
-@app.get("/users", status_code=200)
-def get_users():
-    """
-    Returns a list of all users
+    Returns a list of all repmaxs
     """
     con = get_connection()
-    return get_users_db(con)
+    return get_repmaxs_db(con)
 
 
-@app.post("/users", status_code=status.HTTP_201_CREATED)
-def create_user(user: UserCreate, con: Any = Depends(get_connection)):
+@app.post("/repmaxs", status_code=status.HTTP_201_CREATED)
+def create_repmax(repmax: RepmaxCreate, con: Any = Depends(get_connection)):
     """
-    Creates a user
+    Creates a repmax
 
-    Raises exception if name already exists.
+    Raises exception if repmax already exists.
     Also raises exception if something went wrong when creating the user
     """
     try:
-        result = create_user_db(con, user.password, user.name,
-                                user.weight, user.user_record_id, user.weight)
+        result = create_repmax_db(con, repmax.exercise_id, repmax.user_id, repmax.weight)
         if result:
-            return {'message': f'User created sucessfully with id: {result}'}
+            return {'message': f'Repmax created sucessfully with id: {result}'}
         raise HTTPException(
-            detail='User not created properly', status_code=400)
+            detail='Repmax not created properly', status_code=400)
     except IntegrityError:
         raise HTTPException(
-            status_code=409, detail="Name already exists.")
+            status_code=409, detail="Repmax already exists.")
 
 
-@app.patch('/users/{user_id}', status_code=status.HTTP_200_OK)
-def update_user(user_id: int, user: UserUpdate, con: Any = Depends(get_connection)):
+@app.patch('/repmaxs/{repmax_id}', status_code=status.HTTP_200_OK)
+def update_repmax(repmax_id: int, repmax: RepmaxUpdate, con: Any = Depends(get_connection)):
     """
-    Updates one or more fields in a user by ID
+    Updates one or more fields in a repmaxby ID
 
-    Raises exception if name already exists, or if no input was provided.
+    Raises exception if repmax already exists, or if no input was provided.
 
     """
     try:
-        # Extract fields from UserUpdate and iterate over them
+        # Extract fields from RepmaxUpdate and iterate over them
         # Only include fields that are set
-        update_data = user.model_dump(exclude_unset=True)
+        update_data = repmax.model_dump(exclude_unset=True)
         if not update_data:
             raise ValueError("No fields provided for update.")
 
         for column, value in update_data.items():
             # The function gets called for every row to enable the option to update serveral rows at once
-            update_user_db(con, user_id, update_column=column,
+            update_repmax_db(con, repmax_id, update_column=column,
                            update_value=value)
 
-        return {'message': 'User updated successfully'}
+        return {'message': 'Repmax updated successfully'}
 
     except IntegrityError:
         raise HTTPException(
-            status_code=409, detail="Username or email already exists.")
+            status_code=409, detail="Repmax already exists.")
 
 
-@app.delete('/users/{user_id}')
-def delete_user(user_id: int, con: Any = Depends(get_connection)):
+@app.delete('/repmaxs/{repmax_id}')
+def delete_repmax(repmax_id: int, con: Any = Depends(get_connection)):
     """
-    Deletes a user by ID
+    Deletes a repmax by ID
 
     Raises exception if user could not be found
     """
-    result = delete_user_db(con, user_id)
+    result = delete_repmax_db(con, repmax_id)
     if result:
-        return {'message': f'User with id {result['user_id']} deleted'}
+        return {'message': f'Repmax with id {result['repmax_id']} deleted'}
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-#                                                   Categories
+    
+
+#                                                   Categories Endpoints
     
 
 

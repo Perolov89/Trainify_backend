@@ -380,7 +380,7 @@ def delete_record_db(con, record_id: int):
 
 
 
-def get_repmax_db(con):
+def get_repmaxs_db(con):
     """
     Fetches all repmax's
     """
@@ -548,7 +548,7 @@ def create_workout_db(con, name, timecap, record_id, exercise_id):
         )
 
 
-def update_workouts_db(con, workout_id: int, update_column: str, update_value: str):
+def update_workout_db(con, workout_id: int, update_column: str, update_value: str):
     """
     Update one or more values in workouts
 
@@ -582,7 +582,7 @@ def update_workouts_db(con, workout_id: int, update_column: str, update_value: s
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
-def delete_record_db(con, workout_id: int):
+def delete_workout_db(con, workout_id: int):
     """
     Delete a workout by ID
 
