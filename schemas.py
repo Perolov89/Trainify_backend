@@ -35,8 +35,8 @@ class UserResponse(BaseModel):
 
 #                                                            Exercise
 class ExerciseCreate(BaseModel):
-    exercise_name: str = Field(max_length=250)
-    exercise_weight: int
+    name: str = Field(max_length=250)
+    weight: int
     repmax_id: int
     primary_muscle: Optional[str] = Field(None, max_length=100)
     secondary_muscle: Optional[str] = Field(None, max_length=100)
@@ -44,8 +44,8 @@ class ExerciseCreate(BaseModel):
     base_exercise: bool
 
 class ExerciseUpdate(BaseModel):
-    exercise_name: Optional[str] = Field(None, max_length=250)
-    exercise_weight: Optional[int] = Field(None)
+    name: Optional[str] = Field(None, max_length=250)
+    weight: Optional[int] = Field(None)
     repmax_id: Optional[int] = Field(None)
     primary_muscle: Optional[str] = Field(None, max_length=100)
     secondary_muscle: Optional[str] = Field(None, max_length=100)
@@ -54,8 +54,8 @@ class ExerciseUpdate(BaseModel):
 
 class ExerciseResponse(BaseModel):
     id: int
-    exercise_name: str = Field(max_length=250)
-    exercise_weight: int
+    name: str = Field(max_length=250)
+    weight: int
     repmax_id: int
     primary_muscle: Optional[str]
     secondary_muscle: Optional[str]
@@ -100,20 +100,20 @@ class RepmaxResponse(BaseModel):
 
 #                                                            Workout
 class WorkoutCreate(BaseModel):
-    workout_name: str = Field(max_length=250)
+    name: str = Field(max_length=250)
     timecap: Optional[int]
     record_id: int
     exercise_id: int
 
 class WorkoutUpdate(BaseModel):
-    workout_name: Optional[str] = Field(None, max_length=250)
+    name: Optional[str] = Field(None, max_length=250)
     timecap: Optional[int] = Field(None)
     record_id: Optional[int] = Field(None)
     exercise_id: Optional[int] = Field(None)
 
 class WorkoutResponse(BaseModel):
     id: int
-    workout_name: str = Field(max_length=250)
+    name: str = Field(max_length=250)
     timecap: Optional[int]
     record_id: int
     exercise_id: int
@@ -121,8 +121,8 @@ class WorkoutResponse(BaseModel):
 
 #                                                           Category
 class CategoryCreate(BaseModel):
-    category_name: str = Field(max_length=100)
+    name: str = Field(max_length=100)
 
 class CategoryResponse(BaseModel):
     id: int
-    category_name: str = Field(max_length=100)
+    name: str = Field(max_length=100)

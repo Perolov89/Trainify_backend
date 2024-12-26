@@ -168,7 +168,7 @@ def get_exercise_db(con, exercise_id: int):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
-def create_exercise_db(con, exercise_name, exercise_weight, repmax_id, primary_muscle, secondary_muscle, category_id, base_exercise):
+def create_exercise_db(con, name, weight, repmax_id, primary_muscle, secondary_muscle, category_id, base_exercise):
     """
     Creates new exercise
 
@@ -179,23 +179,23 @@ def create_exercise_db(con, exercise_name, exercise_weight, repmax_id, primary_m
             with con.cursor(cursor_factory=RealDictCursor) as cursor:
                 cursor.execute(
                     """
-                    INSERT INTO exercises(exercise_name,exercise_weight,repmax_id,primary_muscle,secondary_muscle,category_id, base_exercise)
+                    INSERT INTO exercises(name,weight,repmax_id,primary_muscle,secondary_muscle,category_id, base_exercise)
                     VALUES(%s,%s,%s,%s,%s,%s,%s)
                     RETURNING exercise_id
                     """,
-                    (exercise_name, exercise_weight, repmax_id,
+                    (name, weight, repmax_id,
                      primary_muscle, secondary_muscle, category_id, base_exercise),
                 )
                 result = cursor.fetchone()
                 if result:
                     print(f"Exercise {
-                          exercise_name} was created successfully!")
+                          name} was created successfully!")
                     return result['exercise_id']
     except ForeignKeyViolation:
         # Transaction will automatically rollback due to the context manager
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid repmax_id, primary_muscle_id,secondary_muscle_id or categpory_id provided"
+            detail="Invalid repmax_id, primary_muscle_id,secondary_muscle_id or category_id provided"
         )
 
 
@@ -208,7 +208,7 @@ def update_exercise_db(con, exercise_id: int, update_column: str, update_value: 
     """
 
     # Validation to avoid sql-injection
-    valid_columns = {'exercise_name', 'exercise_weight', 'repmax_id',
+    valid_columns = {'name', 'weight', 'repmax_id',
                      'primary_muscle', 'secondary_muscle', 'category_id', 'base_exercise'}
     if update_column not in valid_columns:
         raise ValueError(f"Invalid column name: {update_column}")
@@ -377,6 +377,9 @@ def delete_record_db(con, record_id: int):
 #                                               Repmaxes
 
 
+
+
+
 def get_repmax_db(con):
     """
     Fetches all repmax's
@@ -479,8 +482,27 @@ def delete_repmax_db(con, repmax_id: int):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
-#                                               workouts
+#                                               Workouts
 
+
+def get_workout_db(con, workout_id: int):
+    """
+    Fetches one workout based on the id
+    raises: Error if workout was not found
+    """
+    with con:
+        with con.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(
+                """
+                           SELECT * FROM workouts
+                           WHERE workout_id = %s
+                           """,
+                (workout_id,),
+            )
+            result = cursor.fetchone()
+            if result:
+                return result
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 def get_workouts_db(con):
     """
@@ -497,7 +519,7 @@ def get_workouts_db(con):
             return result
 
 
-def create_workout_db(con, workout_name, timecap, record_id, exercise_id):
+def create_workout_db(con, name, timecap, record_id, exercise_id):
     """
     Creates new workout
 
@@ -512,11 +534,11 @@ def create_workout_db(con, workout_name, timecap, record_id, exercise_id):
                     VALUES(%s,%s,%s,%s)
                     RETURNING workout_id
                     """,
-                    (workout_name, timecap, record_id, exercise_id),
+                    (name, timecap, record_id, exercise_id),
                 )
                 result = cursor.fetchone()
                 if result:
-                    print(f"Workout {workout_name} was created successfully!")
+                    print(f"Workout {name} was created successfully!")
                     return result['workout_id']
     except ForeignKeyViolation:
         # Transaction will automatically rollback due to the context manager
@@ -600,7 +622,7 @@ def get_categories_db(con):
             return result
 
 
-def create_category_db(con, category_name):
+def create_category_db(con, name):
     """
     Creates new category
 
@@ -614,11 +636,11 @@ def create_category_db(con, category_name):
                 VALUES(%s)
                 RETURNING category_id
                 """,
-                (category_name),
+                (name),
             )
             result = cursor.fetchone()
             if result:
-                print(f"Category {category_name} was created successfully!")
+                print(f"Category {name} was created successfully!")
                 return result['category_id']
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
