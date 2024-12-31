@@ -91,6 +91,7 @@ def create_tables():
         timecap BIGINT NOT NULL,
         record_id INT NOT NULL,
         exercise_id INT NOT NULL,
+        for_kids BOOL,
         FOREIGN KEY (record_id) REFERENCES records (record_id) ON DELETE CASCADE,
         FOREIGN KEY (exercise_id) REFERENCES exercises (exercise_id) ON DELETE CASCADE
     );

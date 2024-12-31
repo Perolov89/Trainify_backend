@@ -309,7 +309,7 @@ def create_user(workout: WorkoutCreate, con: Any = Depends(get_connection)):
     """
     try:
         result = create_workout_db(con, workout.name, workout.timecap,
-                                 workout.record_id, workout.exercise_id)
+                                 workout.record_id, workout.exercise_id, workout.for_kids)
         if result:
             return {'message': f'Workout created sucessfully with id: {result}'}
         raise HTTPException(

@@ -519,7 +519,7 @@ def get_workouts_db(con):
             return result
 
 
-def create_workout_db(con, name, timecap, record_id, exercise_id):
+def create_workout_db(con, name, timecap, record_id, exercise_id, for_kids):
     """
     Creates new workout
 
@@ -530,11 +530,11 @@ def create_workout_db(con, name, timecap, record_id, exercise_id):
             with con.cursor(cursor_factory=RealDictCursor) as cursor:
                 cursor.execute(
                     """
-                    INSERT INTO workouts(workout_name,timecap,record_id,exercise_id)
-                    VALUES(%s,%s,%s,%s)
+                    INSERT INTO workouts(workout_name,timecap,record_id,exercise_id, for_kids)
+                    VALUES(%s,%s,%s,%s, %s)
                     RETURNING workout_id
                     """,
-                    (name, timecap, record_id, exercise_id),
+                    (name, timecap, record_id, exercise_id, for_kids),
                 )
                 result = cursor.fetchone()
                 if result:
@@ -557,7 +557,7 @@ def update_workout_db(con, workout_id: int, update_column: str, update_value: st
     """
 
     # Validation to avoid sql-injection
-    valid_columns = {'workout_name', 'timecap', 'record_id', 'exercise_id'}
+    valid_columns = {'workout_name', 'timecap', 'record_id', 'exercise_id', 'for_kids'}
     if update_column not in valid_columns:
         raise ValueError(f"Invalid column name: {update_column}")
 
