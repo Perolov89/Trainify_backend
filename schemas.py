@@ -8,26 +8,26 @@ from datetime import datetime
 
 
 class UserCreate(BaseModel):
-    password: str= Field(max_length=100)
+    password: str = Field(max_length=100)
     name: str = Field(max_length=250)
     weight: int
     user_record_id: Optional[int]
-    height: Optional[int]
+    height: int
 
 
 
 class UserUpdate(BaseModel):
-    password: Optional[str] = Field(None)
+    password: Optional[str] = Field(None, max_length=100)
     name: Optional[str] = Field(None, max_length=250)
-    weight: Optional[int] = Field(None)
-    user_record_id: Optional[int] = Field(None)
-    height: Optional[int] = Field(None)
+    weight: Optional[int] = None
+    user_record_id: Optional[int] = None
+    height: Optional[int] = None
 
 
 
 class UserResponse(BaseModel):
     id: int
-    password: str= Field(max_length=100)
+    password: str = Field(max_length=100)
     name: str = Field(max_length=250)
     weight: int
     user_record_id: int
@@ -45,20 +45,20 @@ class ExerciseCreate(BaseModel):
 
 class ExerciseUpdate(BaseModel):
     name: Optional[str] = Field(None, max_length=250)
-    weight: Optional[int] = Field(None)
-    repmax_id: Optional[int] = Field(None)
+    weight: Optional[int] = None
+    repmax_id: Optional[int] = None
     primary_muscle: Optional[str] = Field(None, max_length=100)
     secondary_muscle: Optional[str] = Field(None, max_length=100)
-    category_id: Optional[int] = Field(None)
-    base_exercise: Optional[bool]
+    category_id: Optional[int] = None
+    base_exercise: Optional[bool] = None
 
 class ExerciseResponse(BaseModel):
     id: int
     name: str = Field(max_length=250)
     weight: int
     repmax_id: int
-    primary_muscle: Optional[str]
-    secondary_muscle: Optional[str]
+    primary_muscle: str | None
+    secondary_muscle: str | None
     category_id: int
     base_exercise: bool
 
@@ -69,9 +69,9 @@ class RecordCreate(BaseModel):
     record_time: datetime
 
 class RecordUpdate(BaseModel):
-    workout_id: Optional[int] = Field(None)
-    user_id: Optional[int] = Field(None)
-    record_time: Optional[datetime] = Field(None)
+    workout_id: int | None = Field(...)
+    user_id: int | None = Field(...)
+    record_time: datetime | None = Field(...)
 
 class RecordResponse(BaseModel):
     id: int
@@ -87,9 +87,9 @@ class RepmaxCreate(BaseModel):
     weight: int
 
 class RepmaxUpdate(BaseModel):
-    exercise_id: Optional[int] = Field(None)
-    user_id: Optional[int] = Field(None)
-    weight: Optional[int] = Field(None)
+    exercise_id: int | None = Field(...)
+    user_id: int | None = Field(...)
+    weight: int | None = Field(...)
 
 class RepmaxResponse(BaseModel):
     id: int
@@ -101,22 +101,25 @@ class RepmaxResponse(BaseModel):
 #                                                            Workout
 class WorkoutCreate(BaseModel):
     name: str = Field(max_length=250)
-    timecap: Optional[int]
+    timecap: int | None = Field(...)
     record_id: int
     exercise_id: int
+    for_kids: bool
 
 class WorkoutUpdate(BaseModel):
-    name: Optional[str] = Field(None, max_length=250)
-    timecap: Optional[int] = Field(None)
-    record_id: Optional[int] = Field(None)
-    exercise_id: Optional[int] = Field(None)
+    name: str | None = Field(max_length=250)
+    timecap: int | None = Field(...)
+    record_id: int | None = Field(...)
+    exercise_id: int | None = Field(...)
+    for_kids: bool
 
 class WorkoutResponse(BaseModel):
     id: int
     name: str = Field(max_length=250)
-    timecap: Optional[int]
+    timecap: int | None = Field(...)
     record_id: int
     exercise_id: int
+    for_kids: bool
 
 
 #                                                           Category

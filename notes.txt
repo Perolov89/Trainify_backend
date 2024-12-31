@@ -1,0 +1,12 @@
+pydantic nullable or required:
+
+from pydantic import BaseModel
+
+class MyModel(BaseModel):
+    not_required_and_nullable: Optional[str] = None
+    not_required_not_nullable: str = None
+    required_but_nullable: Optional[str]
+    required_not_nullable: str
+
+
+

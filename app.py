@@ -4,8 +4,8 @@ from typing import Any
 import psycopg2
 from db_setup import get_connection
 from fastapi import FastAPI, HTTPException, status, Depends
-from db import create_user_db, get_user_db, update_user_db, delete_user_db, get_users_db,get_records_db,get_categories_db,get_exercise_db,get_exercises_db,get_record_db,get_workout_db,get_repmaxs_db,get_workouts_db,update_exercise_db,update_records_db,update_repmax_db,update_workout_db,create_category_db,create_exercise_db,create_record_db,create_repmax_db,create_workout_db,delete_category_db,delete_exercise_db,delete_record_db,delete_repmax_db,delete_workout_db
-from schemas import UserCreate, UserUpdate,RecordCreate,RecordResponse,RecordUpdate,RepmaxCreate,RepmaxResponse,RepmaxUpdate,UserResponse,WorkoutCreate,WorkoutResponse,WorkoutUpdate,ExerciseCreate,ExerciseResponse,ExerciseUpdate,CategoryResponse,CategoryCreate, CategoryUpdate
+from db import create_user_db, get_user_db, update_user_db, delete_user_db, get_users_db,get_records_db,get_categories_db,get_exercise_db,get_exercises_db,get_record_db,get_workout_db,get_repmaxs_db,get_workouts_db,update_records_db,update_repmax_db,update_workout_db,create_category_db,create_exercise_db,create_record_db,create_repmax_db,create_workout_db,delete_category_db,delete_exercise_db,delete_record_db,delete_repmax_db,delete_workout_db
+from schemas import UserCreate, UserUpdate,RecordCreate,RecordUpdate,RepmaxCreate,RepmaxUpdate,WorkoutCreate,WorkoutUpdate,ExerciseCreate,ExerciseUpdate,CategoryCreate
 from psycopg2.errors import IntegrityError
 app = FastAPI()
 
@@ -444,7 +444,7 @@ def get_categories():
 
 
 @app.post("/categories", status_code=status.HTTP_201_CREATED)
-def create_user(category: CategoryCreate, con: Any = Depends(get_connection)):
+def create_category(category: CategoryCreate, con: Any = Depends(get_connection)):
     """
     Creates a category
 
@@ -464,13 +464,13 @@ def create_user(category: CategoryCreate, con: Any = Depends(get_connection)):
 
 
 @app.delete('/categories/{category_id}')
-def delete_user(user_id: int, con: Any = Depends(get_connection)):
+def delete_category(user_id: int, con: Any = Depends(get_connection)):
     """
     Deletes a category by ID
 
     Raises exception if category could not be found
     """
-    result = delete_user_db(con, user_id)
+    result = delete_category_db(con, user_id)
     if result:
         return {'message': f'Category with id {result['category_id']} deleted'}
     else:
