@@ -57,7 +57,7 @@ def create_user(user: UserCreate, con: Any = Depends(get_connection)):
     """
     try:
         result = create_user_db(con, user.password, user.name,
-                                user.weight, user.user_record_id, user.weight)
+                                user.weight, user.user_record_id, user.height)
         if result:
             return {'message': f'User created sucessfully with id: {result}'}
         raise HTTPException(

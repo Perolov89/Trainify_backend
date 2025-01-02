@@ -11,7 +11,7 @@ class UserCreate(BaseModel):
     password: str = Field(max_length=100)
     name: str = Field(max_length=250)
     weight: int
-    user_record_id: Optional[int]
+    user_record_id: Optional[int] = None
     height: int
 
 

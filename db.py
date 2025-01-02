@@ -59,7 +59,7 @@ def create_user_db(con, password, name, weight, user_record_id, height):
                     VALUES(%s,%s,%s,%s,%s)
                     RETURNING user_id
                     """,
-                    (name, password, name, weight, user_record_id, height),
+                    (password, name, weight, user_record_id, height),
                 )
                 result = cursor.fetchone()
                 if result:
