@@ -103,14 +103,12 @@ class WorkoutCreate(BaseModel):
     name: str = Field(max_length=250)
     timecap: int | None = Field(...)
     record_id: int
-    exercise_id: int
     for_kids: bool
 
 class WorkoutUpdate(BaseModel):
     name: str | None = Field(max_length=250)
     timecap: int | None = Field(...)
     record_id: int | None = Field(...)
-    exercise_id: int | None = Field(...)
     for_kids: bool
 
 class WorkoutResponse(BaseModel):
@@ -118,7 +116,6 @@ class WorkoutResponse(BaseModel):
     name: str = Field(max_length=250)
     timecap: int | None = Field(...)
     record_id: int
-    exercise_id: int
     for_kids: bool
 
 
@@ -129,3 +126,26 @@ class CategoryCreate(BaseModel):
 class CategoryResponse(BaseModel):
     id: int
     name: str = Field(max_length=100)
+
+
+#                                                       Workout_exercises
+    
+class WorkoutExerciseCreate(BaseModel):
+    workout_id: int
+    exercise_id: int
+    sets: int | None = Field(default=0, ge=0)
+    reps: int | None = Field(default=0, ge=0)
+    rest_time: int | None = Field(default=0, ge=0)
+
+class WorkoutExerciseUpdate(BaseModel):
+    sets: int | None = Field(default=None, ge=0)
+    reps: int | None = Field(default=None, ge=0)
+    rest_time: int | None = Field(default=None, ge=0)
+
+class WorkoutExerciseResponse(BaseModel):
+    workout_exercise_id: int
+    workout_id: int
+    exercise_id: int
+    sets: int
+    reps: int
+    rest_time: int

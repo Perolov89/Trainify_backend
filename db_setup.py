@@ -59,6 +59,7 @@ def create_tables():
         primary_muscle VARCHAR(100),
         secondary_muscle VARCHAR(100),
         category_id INT NOT NULL,
+        base_exercise BOOL NOT NULL,
         FOREIGN KEY (category_id) REFERENCES categories (category_id) ON DELETE CASCADE
     );
     """
@@ -95,7 +96,21 @@ def create_tables():
         FOREIGN KEY (record_id) REFERENCES records (record_id) ON DELETE CASCADE,
         FOREIGN KEY (exercise_id) REFERENCES exercises (exercise_id) ON DELETE CASCADE
     );
+    """,
+
+    workout_exercises_table = """
+    CREATE TABLE workout_exercises (
+    workout_exercise_id SERIAL PRIMARY KEY,
+    workout_id INT NOT NULL,
+    exercise_id INT NOT NULL,
+    sets INT DEFAULT 0,
+    reps INT DEFAULT 0,
+    rest_time BIGINT DEFAULT 0,
+    FOREIGN KEY (workout_id) REFERENCES workouts (workout_id) ON DELETE CASCADE,
+    FOREIGN KEY (exercise_id) REFERENCES exercises (exercise_id) ON DELETE CASCADE
+    );
     """
+
 
     # Execute the table creation statements
     with connection:
@@ -106,6 +121,7 @@ def create_tables():
             cursor.execute(records_table)
             cursor.execute(repmax_table)
             cursor.execute(workouts_table)
+            cursor.execute(workout_exercises_table)
 
 if __name__ == "__main__":
     # Execute the script to create tables

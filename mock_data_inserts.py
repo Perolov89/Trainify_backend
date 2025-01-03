@@ -71,10 +71,10 @@ def insert_data():
         """,
 
         # Workouts
-        """INSERT INTO workouts (workout_name, timecap, record_id, exercise_id, for_kids) VALUES
-        ('Full Body Workout', 30, 1, 1, FALSE),
-        ('Leg Day', 45, 2, 2, FALSE),
-        ('Back and Core', 50, 3, 3, TRUE);
+        """INSERT INTO workouts (workout_name, timecap, record_id, for_kids) VALUES
+        ('Full Body Workout', 30, 1, FALSE),
+        ('Leg Day', 45, 2, FALSE),
+        ('Back and Core', 50, 3, TRUE);
         """,
     ]
 

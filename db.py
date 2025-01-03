@@ -519,7 +519,7 @@ def get_workouts_db(con):
             return result
 
 
-def create_workout_db(con, name, timecap, record_id, exercise_id, for_kids):
+def create_workout_db(con, name, timecap, record_id, for_kids):
     """
     Creates new workout
 
@@ -530,11 +530,11 @@ def create_workout_db(con, name, timecap, record_id, exercise_id, for_kids):
             with con.cursor(cursor_factory=RealDictCursor) as cursor:
                 cursor.execute(
                     """
-                    INSERT INTO workouts(workout_name,timecap,record_id,exercise_id, for_kids)
-                    VALUES(%s,%s,%s,%s, %s)
+                    INSERT INTO workouts(workout_name,timecap,record_id, for_kids)
+                    VALUES(%s,%s,%s,%s)
                     RETURNING workout_id
                     """,
-                    (name, timecap, record_id, exercise_id, for_kids),
+                    (name, timecap, record_id, for_kids),
                 )
                 result = cursor.fetchone()
                 if result:
@@ -557,7 +557,7 @@ def update_workout_db(con, workout_id: int, update_column: str, update_value: st
     """
 
     # Validation to avoid sql-injection
-    valid_columns = {'workout_name', 'timecap', 'record_id', 'exercise_id', 'for_kids'}
+    valid_columns = {'workout_name', 'timecap', 'record_id', 'for_kids'}
     if update_column not in valid_columns:
         raise ValueError(f"Invalid column name: {update_column}")
 
@@ -663,5 +663,90 @@ def delete_category_db(con, category_id: int):
             result = cursor.fetchone()
             if result:
                 print(f"Category was deleted successfully!")
+                return result
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+
+#                                       workout_exercises
+
+def get_workout_exercises_db(con):
+    with con:
+        with con.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(
+                """
+                SELECT * FROM workout_exercises;
+                """
+            )
+            return cursor.fetchall()
+
+
+def get_workout_exercises_by_workout_id_db(con, workout_id: int):
+    with con:
+        with con.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(
+                """
+                SELECT * FROM workout_exercises
+                WHERE workout_id = %s;
+                """,
+                (workout_id,)
+            )
+            return cursor.fetchall()
+
+
+def create_workout_exercise_db(con, workout_id: int, exercise_id: int, sets: int, reps: int, rest_time: int):
+    try:
+        with con:
+            with con.cursor(cursor_factory=RealDictCursor) as cursor:
+                cursor.execute(
+                    """
+                    INSERT INTO workout_exercises (workout_id, exercise_id, sets, reps, rest_time)
+                    VALUES (%s, %s, %s, %s, %s)
+                    RETURNING workout_exercise_id;
+                    """,
+                    (workout_id, exercise_id, sets, reps, rest_time)
+                )
+                return cursor.fetchone()['workout_exercise_id']
+    except ForeignKeyViolation:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid workout_id or exercise_id provided"
+        )
+
+
+def update_workout_exercise_db(con, workout_exercise_id: int, update_column: str, update_value: int):
+    valid_columns = {'sets', 'reps', 'rest_time'}
+    if update_column not in valid_columns:
+        raise ValueError(f"Invalid column name: {update_column}")
+
+    with con:
+        with con.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(
+                f"""
+                UPDATE workout_exercises
+                SET {update_column} = %s
+                WHERE workout_exercise_id = %s
+                RETURNING workout_exercise_id;
+                """,
+                (update_value, workout_exercise_id)
+            )
+            result = cursor.fetchone()
+            if result:
+                return result
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+
+def delete_workout_exercise_db(con, workout_exercise_id: int):
+    with con:
+        with con.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(
+                """
+                DELETE FROM workout_exercises
+                WHERE workout_exercise_id = %s
+                RETURNING workout_exercise_id;
+                """,
+                (workout_exercise_id,)
+            )
+            result = cursor.fetchone()
+            if result:
                 return result
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
