@@ -1,4 +1,5 @@
-import psycopg2
+from datetime import datetime
+
 from psycopg2.extras import RealDictCursor
 from fastapi import HTTPException, status
 from psycopg2.errors import ForeignKeyViolation
@@ -295,7 +296,7 @@ def get_records_db(con):
             return result
 
 
-def create_record_db(con, workout_id, user_id, record_time):
+def create_record_db(con, workout_id, user_id, record_date, record_time):
     """
     Creates new record
 
@@ -306,11 +307,11 @@ def create_record_db(con, workout_id, user_id, record_time):
             with con.cursor(cursor_factory=RealDictCursor) as cursor:
                 cursor.execute(
                     """
-                    INSERT INTO records(workout_id, user_id, record_time)
+                    INSERT INTO records(workout_id, user_id,record_date ,record_time)
                     VALUES(%s,%s,%s)
                     RETURNING record_id
                     """,
-                    (workout_id, user_id, record_time),
+                    (workout_id, user_id, record_date, record_time),
                 )
                 result = cursor.fetchone()
                 if result:
@@ -327,28 +328,31 @@ def create_record_db(con, workout_id, user_id, record_time):
 
 def update_records_db(con, record_id: int, record_time: str):
     """
-    Update one or more values in records
+    Update record_time and record_date in the records table.
 
-    Raises exception if no value is passed
-    Also raises exception if the record is not found 
+    Raises:
+        ValueError: If record_time is empty.
+        HTTPException: If the record is not found.
     """
-    # Check if value is empty
-
     if not record_time:
-        raise ValueError('No value was passed')
+        raise ValueError("No value was passed")
+
+    # Get the current timestamp
+    current_date = datetime.now()
+
     with con:
         with con.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute("""
                             UPDATE records
-                            SET record_time = %s
+                            SET record_time = %s, record_date = %s
                             WHERE record_id = %s
                             RETURNING record_id;
-                            """, (record_time, record_id))
+                            """, (record_time, current_date, record_id))
             result = cursor.fetchone()
             if result:
                 print(f"Record was updated successfully!")
                 return result
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record not found")
 
 
 def delete_record_db(con, record_id: int):
@@ -375,10 +379,6 @@ def delete_record_db(con, record_id: int):
 
 
 #                                               Repmaxes
-
-
-
-
 
 def get_repmaxs_db(con):
     """

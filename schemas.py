@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel, Field, field_validator
 from typing import Optional
-from datetime import datetime
+from datetime import datetime,time
 
 #                                                               User
 
@@ -66,18 +66,21 @@ class ExerciseResponse(BaseModel):
 class RecordCreate(BaseModel):
     workout_id: int
     user_id: int
-    record_time: datetime
+    record_date: datetime
+    record_time: time
 
 class RecordUpdate(BaseModel):
     workout_id: int | None = Field(...)
     user_id: int | None = Field(...)
-    record_time: datetime | None = Field(...)
+    record_date: datetime | None = Field(...)
+    record_time: time | None = Field(...)
 
 class RecordResponse(BaseModel):
     id: int
     workout_id: int
     user_id: int
-    record_time: datetime
+    record_date: datetime
+    record_time: time
 
 
 #                                                              Repmax
